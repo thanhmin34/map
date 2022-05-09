@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Map, { Marker, Popup } from "react-map-gl";
-import axios from "axios";
+import ReactPaginate from "react-paginate";
 import "./index.css";
-const getAddress = () => {
-  return axios
-    .get(`https://coinmap.org/api/v1/venues/?limit=28400`)
-    .then((response) => response.data)
-    .catch((err) => console.log(err));
-};
 
-const num = 5000;
+const num = 20;
+// const itemsPerPage = 20;
 const Mapbox = () => {
   const [page, setPage] = useState({ start: 0, end: num });
   const [address, setAddress] = useState([]);
@@ -19,37 +14,54 @@ const Mapbox = () => {
     zoom: 4,
   });
 
-  useEffect(() => {
-    getAddress().then((data) => {
-      return setAddress(data?.venues);
+  // const [pageCount, setPageCount] = useState(0);
+
+  // const [itemOffset, setItemOffset] = useState(0);
+
+  // useEffect(() => {
+  //   if (!address) return null;
+  //   const endOffset = itemOffset + itemsPerPage;
+
+  //   setPageCount(Math.ceil(address.length / itemsPerPage));
+  // }, [address, itemOffset]);
+
+  const handlePageClick = (event) => {
+    console.log(event.selected + 1);
+    setPage({
+      start: num * (event.selected + 1) - 20,
+      end: num * (event.selected + 1),
     });
-    // console.log("address", address);
-  }, []);
-  const hanldePagination = (opt) => {
-    if (opt === "-") {
-      setPage({ start: page.start - num, end: page.end - num });
-    } else {
-      setPage({ start: page.end, end: page.end + num });
-    }
-    if (page.end <= 1000) setPage({ start: 0, end: 1000 });
-    if (page.end >= address.length)
-      setPage({ start: address.length - 3400, end: address.length });
-    console.log(1);
   };
 
-  const hanldeSetPage = (number) => {
-    if (page.end > address.length) {
-      setPage({
-        start: address.length - 400,
-        end: address.length,
-      });
-      // console.log(2);
-    }
-    setPage({
-      start: num * number,
-      end: (number + 1) * num,
-    });
-  };
+  useEffect(() => {
+    fetch(`https://coinmap.org/api/v1/venues/?limit=28400`)
+      .then((res) => res.json())
+      .then((data) => setAddress(data?.venues))
+      .catch((err) => console.log(err));
+  }, []);
+  // const hanldePagination = (opt) => {
+  //   if (opt === "-") {
+  //     setPage({ start: page.start - num, end: page.end - num });
+  //   } else {
+  //     setPage({ start: page.end, end: page.end + num });
+  //   }
+  //   if (page.end <= 1000) setPage({ start: 0, end: 1000 });
+  //   if (page.end >= address.length)
+  //     setPage({ start: address.length - 3400, end: address.length });
+  // };
+
+  // const hanldeSetPage = (number) => {
+  //   if (page.end > address.length) {
+  //     setPage({
+  //       start: address.length - 400,
+  //       end: address.length,
+  //     });
+  //   }
+  //   setPage({
+  //     start: num * number,
+  //     end: (number + 1) * num,
+  //   });
+  // };
   console.log(page);
   return (
     <div className="map">
@@ -74,7 +86,17 @@ const Mapbox = () => {
             </Marker>
           ))}
       </Map>
-      <div className="pagination">
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="next"
+        className="paginate"
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={5}
+        pageCount={address.length / num}
+        previousLabel="prev"
+        renderOnZeroPageCount={null}
+      />
+      {/* <div className="pagination">
         <button onClick={() => hanldePagination("-")}>prev</button>
         <div className="pani">
           {new Array(6).fill(0).map((item, index) => (
@@ -88,7 +110,7 @@ const Mapbox = () => {
           ))}
         </div>
         <button onClick={() => hanldePagination("+")}>next</button>
-      </div>
+      </div> */}
     </div>
   );
 };
