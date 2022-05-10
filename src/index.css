@@ -35,3 +35,16 @@ code {
   color: #fff;
   cursor: pointer;
 }
+.address {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  margin-left: 50px;
+}
+.item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
