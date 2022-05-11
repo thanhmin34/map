@@ -48,3 +48,18 @@ code {
   gap: 10px;
   cursor: pointer;
 }
+.popup {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 4px;
+  text-align: center;
+  font-size: 14px;
+}
+.relative {
+  position: relative;
+  width: 200px;
+}
+p {
+  margin: 0;
+  padding: 0;
+}

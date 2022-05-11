@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import Map, { Marker, GeolocateControl, ScaleControl } from "react-map-gl";
+import Map, { Marker, Popup } from "react-map-gl";
 import ReactPaginate from "react-paginate";
 import "./index.css";
 
 const num = 20;
-const geolocateStyle = { float: "left", margin: "50px", padding: "10px" };
 
 const Mapbox = () => {
   const [page, setPage] = useState({ start: 0, end: num });
   const [address, setAddress] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
   const mapRef = useRef(null);
   const [viewport, setViewport] = useState({
-    longitude: -123.3124115,
+    longitude: -65.3124115,
     latitude: 48.4377466,
     zoom: 2,
   });
@@ -31,9 +31,10 @@ const Mapbox = () => {
   };
 
   const hanldeSetAddress = (item) => {
+    console.log(item);
     mapRef.current.flyTo({ center: [item.lon, item.lat] });
-    // mapRef.current.zoom({ zoom: 20 });
-    console.log(mapRef.current.zoomTo(18));
+
+    mapRef.current.zoomTo(15);
   };
   // console.log("viewport", viewport);
 
@@ -52,14 +53,33 @@ const Mapbox = () => {
         {address.length > 0 &&
           address.slice(page.start, page.end).map((item, index) => {
             return (
-              <Marker latitude={item.lat} key={index} longitude={item.lon}>
-                <img
-                  width={20}
-                  height={20}
-                  src="https://xuonginthanhpho.com/wp-content/uploads/2020/03/map-marker-icon.png"
-                  alt=""
-                />
-              </Marker>
+              <div key={index} className="relative">
+                <Marker latitude={item.lat} longitude={item.lon}>
+                  <img
+                    onClick={() => setShowPopup(true)}
+                    width={30}
+                    height={30}
+                    src="https://xuonginthanhpho.com/wp-content/uploads/2020/03/map-marker-icon.png"
+                    alt=""
+                  />
+                </Marker>
+                {showPopup && (
+                  <Popup
+                    latitude={item.lat}
+                    longitude={item.lon}
+                    closeButton={true}
+                    closeOnClick={false}
+                    anchor="top"
+                    onClose={() => setShowPopup(!showPopup)}
+                  >
+                    <div className="popup">
+                      <span>{item.id}</span>
+                      <span>{item.category}</span>
+                      <span>{item.name}</span>
+                    </div>
+                  </Popup>
+                )}
+              </div>
             );
           })}
       </Map>
