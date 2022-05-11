@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
-import Map, { Marker, Popup } from "react-map-gl";
+import React, { useEffect, useRef, useState } from "react";
+import Map, { Marker, GeolocateControl, ScaleControl } from "react-map-gl";
 import ReactPaginate from "react-paginate";
 import "./index.css";
 
 const num = 20;
+const geolocateStyle = { float: "left", margin: "50px", padding: "10px" };
 
 const Mapbox = () => {
   const [page, setPage] = useState({ start: 0, end: num });
   const [address, setAddress] = useState([]);
+  const mapRef = useRef(null);
   const [viewport, setViewport] = useState({
-    longitude: 45,
-    latitude: 65,
-    zoom: 4,
+    longitude: -123.3124115,
+    latitude: 48.4377466,
+    zoom: 2,
   });
 
   useEffect(() => {
@@ -29,22 +31,21 @@ const Mapbox = () => {
   };
 
   const hanldeSetAddress = (item) => {
-    setViewport({
-      longitude: item.lon,
-      latitude: item.lat,
-      zoom: 14,
-    });
+    mapRef.current.flyTo({ center: [item.lon, item.lat] });
+    // mapRef.current.zoom({ zoom: 20 });
+    console.log(mapRef.current.zoomTo(18));
   };
-  console.log("viewport", viewport);
+  // console.log("viewport", viewport);
 
   return (
     <div className="map">
       <Map
-        mapStyle="mapbox://styles/mapbox/streets-v9"
+        ref={mapRef}
         style={{
           width: 800,
           height: 500,
         }}
+        mapStyle="mapbox://styles/mapbox/streets-v9"
         initialViewState={viewport}
         mapboxAccessToken="pk.eyJ1IjoidGhhbmhtaW4zNCIsImEiOiJjbDJ1NHR2c3UwMHJuM21tajV1d2Y1cDg2In0.QXuY4i2_HWGOrn7_kMJWGw"
       >
