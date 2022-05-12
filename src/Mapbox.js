@@ -69,7 +69,7 @@ const Mapbox = () => {
                     longitude={item.lon}
                     closeButton={true}
                     closeOnClick={false}
-                    anchor="top"
+                    anchor="bottom"
                     onClose={() => setShowPopup(!showPopup)}
                   >
                     <div className="popup">
