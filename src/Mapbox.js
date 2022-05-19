@@ -34,7 +34,8 @@ const Mapbox = () => {
     console.log(item);
     mapRef.current.flyTo({ center: [item.lon, item.lat] });
 
-    mapRef.current.zoomTo(15);
+    // mapRef.current.zoomTo(15);
+    mapRef.current.setZoom(16);
   };
   // console.log("viewport", viewport);
 
