@@ -8,6 +8,7 @@ const num = 20;
 const Mapbox = () => {
   const [page, setPage] = useState({ start: 0, end: num });
   const [address, setAddress] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const mapRef = useRef(null);
   const [viewport, setViewport] = useState({
@@ -17,9 +18,13 @@ const Mapbox = () => {
   });
 
   useEffect(() => {
+    setLoading(true);
     fetch(`https://coinmap.org/api/v1/venues/?limit=28400`)
       .then((res) => res.json())
-      .then((data) => setAddress(data?.venues))
+      .then((data) => {
+        setAddress(data?.venues);
+        setLoading(false);
+      })
       .catch((err) => console.log(err));
   }, []);
 
@@ -32,12 +37,18 @@ const Mapbox = () => {
 
   const hanldeSetAddress = (item) => {
     console.log(item);
-    mapRef.current.flyTo({ center: [item.lon, item.lat] });
+    setTimeout(() => {
+      mapRef.current.setZoom(7);
+      console.log(1);
 
-    // mapRef.current.zoomTo(15);
-    mapRef.current.setZoom(16);
+      setTimeout(() => {
+        mapRef.current.setZoom(16);
+        console.log(2);
+      }, 5000);
+    }, 2000);
+    mapRef.current.flyTo({ center: [item.lon, item.lat] });
   };
-  // console.log("viewport", viewport);
+  // console.log("loading", loading);
 
   return (
     <div className="map">
@@ -96,7 +107,9 @@ const Mapbox = () => {
       />
 
       <div className="address">
-        {address.length > 0 &&
+        {loading ? <span className="loading">loading...</span> : ""}
+        {!loading &&
+          address.length > 0 &&
           address.slice(page.start, page.end).map((item, index) => (
             <div
               key={item.id}
