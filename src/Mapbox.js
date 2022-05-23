@@ -2,15 +2,18 @@ import React, { useEffect, useRef, useState } from "react";
 import Map, { Marker, Popup } from "react-map-gl";
 import ReactPaginate from "react-paginate";
 import "./index.css";
+import { useSelector } from "react-redux";
 
 const num = 20;
 
 const Mapbox = () => {
-  const [page, setPage] = useState({ start: 0, end: num });
+  const map = useSelector((state) => state.map);
+
   const [address, setAddress] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
+  const [page, setPage] = useState({ start: 0, end: num });
   const mapRef = useRef(null);
+
   const [viewport, setViewport] = useState({
     longitude: -65.3124115,
     latitude: 48.4377466,
@@ -18,15 +21,8 @@ const Mapbox = () => {
   });
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`https://coinmap.org/api/v1/venues/?limit=28400`)
-      .then((res) => res.json())
-      .then((data) => {
-        setAddress(data?.venues);
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    setAddress(map?.items?.venues);
+  }, [map]);
 
   const handlePageClick = (event) => {
     setPage({
@@ -50,6 +46,8 @@ const Mapbox = () => {
   };
   // console.log("loading", loading);
 
+  // console.log(map?.status);
+
   return (
     <div className="map">
       <Map
@@ -62,8 +60,8 @@ const Mapbox = () => {
         initialViewState={viewport}
         mapboxAccessToken="pk.eyJ1IjoidGhhbmhtaW4zNCIsImEiOiJjbDJ1NHR2c3UwMHJuM21tajV1d2Y1cDg2In0.QXuY4i2_HWGOrn7_kMJWGw"
       >
-        {address.length > 0 &&
-          address.slice(page.start, page.end).map((item, index) => {
+        {address?.length > 0 &&
+          address?.slice(page.start, page.end).map((item, index) => {
             return (
               <div key={index} className="relative">
                 <Marker latitude={item.lat} longitude={item.lon}>
@@ -101,26 +99,27 @@ const Mapbox = () => {
         className="paginate"
         onPageChange={handlePageClick}
         pageRangeDisplayed={5}
-        pageCount={address.length / num}
+        pageCount={address?.length / num}
         previousLabel="prev"
         renderOnZeroPageCount={null}
       />
-
-      <div className="address">
-        {loading ? <span className="loading">loading...</span> : ""}
-        {!loading &&
-          address.length > 0 &&
-          address.slice(page.start, page.end).map((item, index) => (
-            <div
-              key={item.id}
-              className="item"
-              onClick={() => hanldeSetAddress(item)}
-            >
-              <span>{index}</span>
-              <p>{item.name}</p>
-            </div>
-          ))}
-      </div>
+      {map?.status === "pending" ? (
+        <span className="loading">loading...</span>
+      ) : (
+        <div className="address">
+          {address?.length > 0 &&
+            address?.slice(page.start, page.end).map((item, index) => (
+              <div
+                key={item.id}
+                className="item"
+                onClick={() => hanldeSetAddress(item)}
+              >
+                <span>{index}</span>
+                <p>{item.name}</p>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 };
